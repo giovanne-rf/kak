@@ -81,6 +81,27 @@ function Assert-PortAvailableOrManaged {
     exit 1
 }
 
+function Wait-BackendReady {
+    $healthUrl = "http://127.0.0.1:8000/api/health"
+    for ($attempt = 1; $attempt -le 30; $attempt++) {
+        try {
+            $response = Invoke-WebRequest -Uri $healthUrl -UseBasicParsing -TimeoutSec 2
+            if ($response.StatusCode -eq 200) {
+                Write-Host "Backend pronto em $healthUrl"
+                return
+            }
+        }
+        catch {
+            Start-Sleep -Seconds 1
+        }
+    }
+
+    Write-Host "Backend nao respondeu em $healthUrl."
+    Write-Host "Confira o erro abaixo:"
+    Get-Content (Join-Path $RuntimeDir "backend.err.log") -ErrorAction SilentlyContinue
+    exit 1
+}
+
 if (-not (Test-Path $BackendPython)) {
     Write-Host "Criando ambiente virtual do backend..."
     Push-Location $BackendDir
@@ -113,6 +134,8 @@ if (Assert-PortAvailableOrManaged -Port 8000 -PidFile (Join-Path $RuntimeDir "ba
     Set-Content -Path (Join-Path $RuntimeDir "backend.pid") -Value $backendProcess.Id
 }
 
+Wait-BackendReady
+
 if (Assert-PortAvailableOrManaged -Port 5173 -PidFile (Join-Path $RuntimeDir "frontend.pid") -ServiceName "Frontend") {
     Write-Host "Subindo frontend..."
     $frontendProcess = Start-Process `
@@ -138,3 +161,4 @@ foreach ($LocalIp in $LocalIps) {
 }
 Write-Host ""
 Write-Host "Se outra maquina receber ERR_CONNECTION_REFUSED, rode .\liberar-firewall.ps1 como Administrador."
+Write-Host "Se receber 502 Bad Gateway, o backend nao esta respondendo; rode .\derrubar-sistema.ps1 e depois .\subir-sistema.ps1 novamente."

@@ -145,6 +145,11 @@ def on_startup() -> None:
     bootstrap_database()
 
 
+@app.get("/api/health")
+def health() -> dict:
+    return {"status": "ok"}
+
+
 def get_current_user(
     authorization: str | None = Header(default=None),
     db: Session = Depends(get_db),

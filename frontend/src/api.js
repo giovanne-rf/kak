@@ -27,7 +27,11 @@ async function request(path, options = {}) {
   const data = contentType.includes("application/json") ? await response.json() : null;
 
   if (!response.ok) {
-    throw new Error(data?.detail || "Nao foi possivel concluir a operacao");
+    const fallbackMessage =
+      response.status === 502
+        ? "Backend indisponivel. Verifique se a API iniciou no servidor."
+        : `Nao foi possivel concluir a operacao (${response.status})`;
+    throw new Error(data?.detail || fallbackMessage);
   }
 
   return data;
