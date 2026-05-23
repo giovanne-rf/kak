@@ -29,6 +29,14 @@ npm run dev
 
 O app fica em `http://127.0.0.1:5173`.
 
+Em outra maquina na mesma rede, acesse pelo IP do computador que esta rodando o sistema, por exemplo:
+
+```text
+http://192.168.0.10:5173
+```
+
+O backend usa a porta `8000`. Libere as portas `5173` e `8000` no firewall do Windows quando for acessar de outro computador.
+
 ## Subir e derrubar tudo
 
 Na pasta raiz do projeto:
