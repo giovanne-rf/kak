@@ -35,7 +35,9 @@ Em outra maquina na mesma rede, acesse pelo IP do computador que esta rodando o 
 http://192.168.0.10:5173
 ```
 
-O backend usa a porta `8000`. Libere as portas `5173` e `8000` no firewall do Windows quando for acessar de outro computador.
+O navegador deve acessar a porta `5173`. As chamadas `/api` e `/uploads` passam pelo frontend e sao encaminhadas para o backend automaticamente.
+
+O backend usa a porta `8000` internamente na maquina servidora. Para acesso de outros computadores, normalmente basta liberar a porta `5173` no firewall. O script abaixo tambem libera `8000` para diagnostico.
 
 Para liberar automaticamente no Windows, abra o PowerShell como Administrador e rode:
 
@@ -43,13 +45,15 @@ Para liberar automaticamente no Windows, abra o PowerShell como Administrador e 
 .\liberar-firewall.ps1
 ```
 
-Se o navegador de outra maquina mostrar `ERR_CONNECTION_REFUSED` em `:8000/api/auth/login`, teste no navegador dessa outra maquina:
+Se o navegador de outra maquina mostrar `ERR_CONNECTION_REFUSED`, confirme que voce atualizou o projeto com `git pull` e subiu novamente o sistema. A chamada de login deve aparecer como `/api/auth/login`, sem `:8000`, no console do navegador.
+
+Para diagnostico, teste no navegador dessa outra maquina:
 
 ```text
 http://IP_DO_SERVIDOR:8000/docs
 ```
 
-Se essa pagina nao abrir, o backend nao esta rodando, o IP usado esta errado, ou o firewall ainda esta bloqueando a porta `8000`.
+Se essa pagina nao abrir, mas `http://IP_DO_SERVIDOR:5173` abrir, o sistema ainda deve funcionar porque o frontend encaminha as chamadas para o backend. Se `/api/auth/login` continuar tentando `:8000`, o navegador esta com uma versao antiga do frontend em cache ou o projeto ainda nao recebeu o ultimo `git pull`.
 
 ## Subir e derrubar tudo
 
