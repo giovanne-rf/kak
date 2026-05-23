@@ -45,6 +45,12 @@ Para liberar automaticamente no Windows, abra o PowerShell como Administrador e 
 .\liberar-firewall.ps1
 ```
 
+Para remover as regras do firewall usando Bash/Git Bash aberto como Administrador:
+
+```bash
+bash ./derrubar-firewall.sh
+```
+
 Se o navegador de outra maquina mostrar `ERR_CONNECTION_REFUSED`, confirme que voce atualizou o projeto com `git pull` e subiu novamente o sistema. A chamada de login deve aparecer como `/api/auth/login`, sem `:8000`, no console do navegador.
 
 Para diagnostico, teste no navegador dessa outra maquina:
