@@ -45,6 +45,8 @@ Para liberar automaticamente no Windows, abra o PowerShell como Administrador e 
 .\liberar-firewall.ps1
 ```
 
+Essa liberacao vale tambem quando a rede do Windows estiver marcada como `Publica`.
+
 Para remover as regras do firewall usando Bash/Git Bash aberto como Administrador:
 
 ```bash

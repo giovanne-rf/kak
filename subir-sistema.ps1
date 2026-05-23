@@ -10,6 +10,8 @@ $HostAddress = "0.0.0.0"
 $LocalIps = @(Get-NetIPAddress -AddressFamily IPv4 | Where-Object {
     $_.IPAddress -notlike "127.*" -and
     $_.IPAddress -notlike "169.254.*" -and
+    $_.InterfaceAlias -notlike "vEthernet*" -and
+    $_.InterfaceAlias -notlike "*WSL*" -and
     $_.PrefixOrigin -ne "WellKnown"
 } | Sort-Object InterfaceAlias | Select-Object -ExpandProperty IPAddress)
 if ($LocalIps.Count -eq 0) {

@@ -28,7 +28,7 @@ foreach ($rule in $rules) {
         -Action Allow `
         -Protocol TCP `
         -LocalPort $rule.Port `
-        -Profile Private,Domain | Out-Null
+        -Profile Any | Out-Null
 
     Write-Host "Regra criada: $($rule.Name) na porta $($rule.Port)"
 }

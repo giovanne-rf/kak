@@ -92,7 +92,7 @@ ips = set()
 hostname = socket.gethostname()
 for info in socket.getaddrinfo(hostname, None, socket.AF_INET):
     ip = info[4][0]
-    if not ip.startswith(("127.", "169.254.")):
+    if not ip.startswith(("127.", "169.254.", "172.23.")):
         ips.add(ip)
 
 if not ips:
