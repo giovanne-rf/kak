@@ -52,11 +52,29 @@ assert_port_available_or_managed() {
 
 wait_backend_ready() {
   local health_url="http://127.0.0.1:8000/api/health"
-  for _ in $(seq 1 30); do
-    if curl -fsS "$health_url" >/dev/null 2>&1; then
+  local backend_pid=""
+  if [[ -f "$RUNTIME_DIR/backend.pid" ]]; then
+    backend_pid="$(head -n 1 "$RUNTIME_DIR/backend.pid" 2>/dev/null || true)"
+  fi
+
+  echo "Aguardando backend responder em $health_url..."
+  for attempt in $(seq 1 30); do
+    if "$BACKEND_PYTHON" -c "import json, urllib.request; data=json.load(urllib.request.urlopen('$health_url', timeout=2)); raise SystemExit(0 if data.get('status') == 'ok' else 1)" >/dev/null 2>&1; then
       echo "Backend pronto em $health_url"
       return 0
     fi
+
+    if [[ -n "$backend_pid" ]] && ! kill -0 "$backend_pid" >/dev/null 2>&1; then
+      echo "Backend encerrou antes de ficar pronto."
+      echo "Confira o erro abaixo:"
+      [[ -f "$RUNTIME_DIR/backend.err.log" ]] && cat "$RUNTIME_DIR/backend.err.log"
+      exit 1
+    fi
+
+    if (( attempt % 5 == 0 )); then
+      echo "Ainda aguardando backend... tentativa $attempt/30"
+    fi
+
     sleep 1
   done
 

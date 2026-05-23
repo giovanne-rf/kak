@@ -75,6 +75,8 @@ Com Bash, Git Bash, Linux ou macOS:
 bash ./subir-sistema.sh
 ```
 
+Se o script parar em `Subindo backend...`, aguarde ate 30 segundos. Ele esta esperando o backend responder em `/api/health`. Se falhar, o proprio script imprime o conteudo de `.runtime/backend.err.log`.
+
 Para parar:
 
 ```bash
