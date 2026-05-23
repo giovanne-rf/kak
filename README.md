@@ -69,6 +69,18 @@ Para parar backend e frontend:
 .\derrubar-sistema.ps1
 ```
 
+Com Bash, Git Bash, Linux ou macOS:
+
+```bash
+bash ./subir-sistema.sh
+```
+
+Para parar:
+
+```bash
+bash ./derrubar-sistema.sh
+```
+
 ## Banco de dados
 
 O SQLite e criado automaticamente em `backend/condominio.db`.
