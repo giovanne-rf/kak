@@ -37,6 +37,20 @@ http://192.168.0.10:5173
 
 O backend usa a porta `8000`. Libere as portas `5173` e `8000` no firewall do Windows quando for acessar de outro computador.
 
+Para liberar automaticamente no Windows, abra o PowerShell como Administrador e rode:
+
+```powershell
+.\liberar-firewall.ps1
+```
+
+Se o navegador de outra maquina mostrar `ERR_CONNECTION_REFUSED` em `:8000/api/auth/login`, teste no navegador dessa outra maquina:
+
+```text
+http://IP_DO_SERVIDOR:8000/docs
+```
+
+Se essa pagina nao abrir, o backend nao esta rodando, o IP usado esta errado, ou o firewall ainda esta bloqueando a porta `8000`.
+
 ## Subir e derrubar tudo
 
 Na pasta raiz do projeto:
