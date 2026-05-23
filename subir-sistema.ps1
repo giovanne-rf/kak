@@ -7,11 +7,13 @@ $RuntimeDir = Join-Path $Root ".runtime"
 $BackendPython = Join-Path $BackendDir ".venv\Scripts\python.exe"
 $FrontendVite = Join-Path $FrontendDir "node_modules\vite\bin\vite.js"
 $HostAddress = "0.0.0.0"
-$LocalIp = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object {
-    $_.IPAddress -notlike "127.*" -and $_.PrefixOrigin -ne "WellKnown"
-} | Select-Object -First 1 -ExpandProperty IPAddress)
-if (-not $LocalIp) {
-    $LocalIp = "127.0.0.1"
+$LocalIps = @(Get-NetIPAddress -AddressFamily IPv4 | Where-Object {
+    $_.IPAddress -notlike "127.*" -and
+    $_.IPAddress -notlike "169.254.*" -and
+    $_.PrefixOrigin -ne "WellKnown"
+} | Sort-Object InterfaceAlias | Select-Object -ExpandProperty IPAddress)
+if ($LocalIps.Count -eq 0) {
+    $LocalIps = @("127.0.0.1")
 }
 
 New-Item -ItemType Directory -Force -Path $RuntimeDir | Out-Null
@@ -128,4 +130,11 @@ Write-Host ""
 Write-Host "Sistema iniciado."
 Write-Host "Frontend: http://127.0.0.1:5173"
 Write-Host "Backend:  http://127.0.0.1:8000"
-Write-Host "Rede:     http://$LocalIp`:5173"
+Write-Host ""
+Write-Host "Enderecos para acesso em outra maquina:"
+foreach ($LocalIp in $LocalIps) {
+    Write-Host "Frontend: http://$LocalIp`:5173"
+    Write-Host "Teste API: http://$LocalIp`:8000/docs"
+}
+Write-Host ""
+Write-Host "Se outra maquina receber ERR_CONNECTION_REFUSED, rode .\liberar-firewall.ps1 como Administrador."
