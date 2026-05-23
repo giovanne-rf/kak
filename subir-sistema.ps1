@@ -6,6 +6,13 @@ $FrontendDir = Join-Path $Root "frontend"
 $RuntimeDir = Join-Path $Root ".runtime"
 $BackendPython = Join-Path $BackendDir ".venv\Scripts\python.exe"
 $FrontendVite = Join-Path $FrontendDir "node_modules\vite\bin\vite.js"
+$HostAddress = "0.0.0.0"
+$LocalIp = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object {
+    $_.IPAddress -notlike "127.*" -and $_.PrefixOrigin -ne "WellKnown"
+} | Select-Object -First 1 -ExpandProperty IPAddress)
+if (-not $LocalIp) {
+    $LocalIp = "127.0.0.1"
+}
 
 New-Item -ItemType Directory -Force -Path $RuntimeDir | Out-Null
 
@@ -95,7 +102,7 @@ if (Assert-PortAvailableOrManaged -Port 8000 -PidFile (Join-Path $RuntimeDir "ba
     Write-Host "Subindo backend..."
     $backendProcess = Start-Process `
         -FilePath $BackendPython `
-        -ArgumentList @("-m", "uvicorn", "app.main:app", "--host", "127.0.0.1", "--port", "8000") `
+        -ArgumentList @("-m", "uvicorn", "app.main:app", "--host", $HostAddress, "--port", "8000") `
         -WorkingDirectory $BackendDir `
         -WindowStyle Hidden `
         -RedirectStandardOutput (Join-Path $RuntimeDir "backend.out.log") `
@@ -108,7 +115,7 @@ if (Assert-PortAvailableOrManaged -Port 5173 -PidFile (Join-Path $RuntimeDir "fr
     Write-Host "Subindo frontend..."
     $frontendProcess = Start-Process `
         -FilePath "node.exe" `
-        -ArgumentList @($FrontendVite, "--host", "127.0.0.1", "--port", "5173") `
+        -ArgumentList @($FrontendVite, "--host", $HostAddress, "--port", "5173") `
         -WorkingDirectory $FrontendDir `
         -WindowStyle Hidden `
         -RedirectStandardOutput (Join-Path $RuntimeDir "frontend.out.log") `
@@ -121,3 +128,4 @@ Write-Host ""
 Write-Host "Sistema iniciado."
 Write-Host "Frontend: http://127.0.0.1:5173"
 Write-Host "Backend:  http://127.0.0.1:8000"
+Write-Host "Rede:     http://$LocalIp`:5173"
